@@ -1,0 +1,171 @@
+{
+    "products": [
+        {
+            "name": "roks-tryit",
+            "label": "Red Hat OpenShift on IBM Cloud Starters",
+            "product_kind": "solution",
+            "tags": [
+                "ocp",
+                "OpenShift",
+                "ROKS",
+                "red_hat",
+                "target_terraform",
+                "terraform"
+            ],
+            "keywords": [
+                "terraform",
+                "red_hat",
+                "cluster",
+                "ocp",
+                "OpenShift"
+            ],
+            "short_description": "Deploys a Simple Red Hat OpenShift cluster.",
+            "long_description": "Deploys a Simple Red Hat OpenShift cluster for the new user with minimal input requred.",
+            "offering_docs_url": "https://github.com/IBM/roks-try-it-da/blob/main/README.md",
+            "offering_icon_url": "https://raw.githubusercontent.com/terraform-ibm-modules/documentation/main/icons/RH_OpenShift.svg",
+            "provider_name": "IBM",
+            "features": [
+                {
+                    "title": "Simple VPC",
+                    "description": "Creates a simple VPC with a single subnet in zone 1 with an attached public gateway"
+                },
+                {
+                    "title": "OpenShift Cluster",
+                    "description": "Creates a simple publicly accessible OpenShift cluster without any attached services"
+                }
+            ],
+            "flavors": [
+                {
+                    "label": "Simple",
+                    "name": "Simple",
+                    "licenses": [
+                        {
+                          "name": "Apache License 2.0",
+                          "url": "https://github.com/IBM/roks-openshift-ai-da/raw/main/LICENSE"
+                        }
+                    ],
+                    "architecture": {
+                        "diagrams": [
+                            {
+                                "diagram": {
+                                    "caption": "Resulting Architecture",
+                                    "url": "https://github.com/IBM/roks-try-it-da/raw/main/docs/ROKS.svg",
+                                    "type": "image/svg+xml"
+                                },
+                                "description": "The resulting architecture of deploying the simple flavor"
+                            }
+                        ]
+                    },
+                    "iam_permissions": [
+                        {
+                            "role_crns": [
+                                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
+                                "crn:v1:bluemix:public:iam::::role:Administrator"
+                            ],
+                            "service_name": "is.vpc"
+                        },
+                        {
+                            "role_crns": [
+                                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
+                                "crn:v1:bluemix:public:iam::::role:Administrator"
+                            ],
+                            "service_name": "containers-kubernetes"
+                        },
+                        {
+                            "role_crns": [
+                                "crn:v1:bluemix:public:iam::::role:Administrator"
+                            ],
+                            "service_name": "ibmcloud-platform"
+                        },
+                        {
+                            "role_crns": [
+                                "crn:v1:bluemix:public:iam::::serviceRole:Manager",
+                                "crn:v1:bluemix:public:iam::::role:Administrator"
+                            ],
+                            "service_name": "cloud-object-storage"
+                        }
+                    ],
+                    "configuration": [
+                        {
+                            "key": "ibmcloud_api_key",
+                            "type": "multiline_secure_value",
+                            "display_name": "Multiline secure value",
+                            "required": true,
+                            "custom_config": {
+                                "grouping": "deployment",
+                                "original_grouping": "deployment",
+                                "type": "multiline_secure_value"
+                            }
+                        },
+                        {
+                            "key": "cluster-name",
+                            "type": "string",
+                            "required": true
+                        },
+                        {
+                            "key": "region",
+                            "type": "string",
+                            "default_value": "us-east",
+                            "description": "IBM Cloud region. Use 'ibmcloud regions' to get the list",
+                            "display_name": "VPC region",
+                            "required": true,
+                            "custom_config": {
+                                "type": "vpc_region",
+                                "grouping": "deployment",
+                                "original_grouping": "deployment",
+                                "config_constraints": {
+                                    "generationType": "2"
+                                }
+                            }
+                        },
+                        {
+                            "key": "ocp-version",
+                            "type": "string",
+                            "required": true,
+                            "options": [
+                                {
+                                    "displayname": "4.12",
+                                    "value": "4.12"
+                                },
+                                {
+                                    "displayname": "4.13",
+                                    "value": "4.13"
+                                },
+                                {
+                                    "displayname": "4.14",
+                                    "value": "4.14"
+                                },
+                                {
+                                    "displayname": "4.15",
+                                    "value": "4.15"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "number-worker-nodes",
+                            "type": "number",
+                            "default_value": 2,
+                            "required": true
+                        },
+                        {
+                            "key": "machine-type",
+                            "type": "string",
+                            "default_value": "bx2.4x16",
+                            "required": true
+                        },
+                        {
+                            "key": "cos-instance",
+                            "type": "string",
+                            "required": false
+                        },
+                        {
+                            "key": "resource-group",
+                            "type": "string",
+                            "required": false
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

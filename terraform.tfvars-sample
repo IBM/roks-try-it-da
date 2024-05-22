@@ -1,0 +1,8 @@
+# can include ibmcloud_api_key value here or in TF_VAR_ibmcloud_api_key environment variable
+cluster-name = "cluster-abc"
+region = "ca-tor"
+ocp-version = "4.15"
+#number-worker-nodes = 2
+#machine-type = "bx2.4x16"
+#cos-instance = "Cloud Object Storage-abc"
+#resource-group = "my-resource-group"
