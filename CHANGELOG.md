@@ -13,3 +13,9 @@ All notable changes to this project will be documented in this file.
    * Add second flavor.
 ### Changed
 ### Fixed
+
+## 1.0.2 - 2024-05-22
+### Added
+### Changed
+### Fixed
+   * Typo

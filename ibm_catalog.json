@@ -167,7 +167,7 @@
                 },
                 {
                     "label": "Simple with Observability",
-                    "name": "Simple with Observability",
+                    "name": "Simple-with-Observability",
                     "working_directory": "./withobserve/",
                     "licenses": [
                         {
