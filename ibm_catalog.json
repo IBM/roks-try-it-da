@@ -45,6 +45,24 @@
                         }
                     ],
                     "architecture": {
+                        "features": [
+                            {
+								"title": "New resource group (if an existing one is not specified)",
+								"description": "Yes"
+							},
+                            {
+								"title": "New VPC with one subnet and an attached public gateway",
+								"description": "Yes"
+							},
+                            {
+								"title": "New Cloud Object Storage instance (if an existing one is not specified)",
+								"description": "Yes"
+							},
+							{
+								"title": "New OpenShift cluster",
+								"description": "Yes"
+							}
+						],
                         "diagrams": [
                             {
                                 "diagram": {
@@ -99,6 +117,7 @@
                         },
                         {
                             "key": "cluster-name",
+                            "default_value": "new-simple-cluster",
                             "type": "string",
                             "required": true
                         },
@@ -122,6 +141,7 @@
                             "key": "ocp-version",
                             "type": "string",
                             "required": true,
+                            "default_value": "4.14",
                             "options": [
                                 {
                                     "displayname": "4.12",
@@ -176,6 +196,28 @@
                         }
                     ],
                     "architecture": {
+                        "features": [
+                            {
+								"title": "New resource group (if an existing one is not specified)",
+								"description": "Yes"
+							},
+                            {
+								"title": "New VPC with one subnet and an attached public gateway",
+								"description": "Yes"
+							},
+                            {
+								"title": "New Cloud Object Storage instance (if an existing one is not specified)",
+								"description": "Yes"
+							},
+                            {
+								"title": "New IBM Cloud Log Analysis and Monitoring instances (if existing ones are not specified)",
+								"description": "Yes"
+							}
+							{
+								"title": "New OpenShift cluster integrated with logging and monitoring instances",
+								"description": "Yes"
+							}
+						],
                         "diagrams": [
                             {
                                 "diagram": {
@@ -245,6 +287,7 @@
                         {
                             "key": "cluster-name",
                             "type": "string",
+                            "default_value": "new-simple-cluster",
                             "required": true
                         },
                         {
@@ -267,6 +310,7 @@
                             "key": "ocp-version",
                             "type": "string",
                             "required": true,
+                            "default_value": "4.14",
                             "options": [
                                 {
                                     "displayname": "4.12",

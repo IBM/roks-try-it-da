@@ -19,3 +19,10 @@ All notable changes to this project will be documented in this file.
 ### Changed
 ### Fixed
    * Typo
+
+## 1.0.3 - 2024-05-24
+### Added
+### Changed
+   * Allow user to reuse logging and/or monitoring instances
+### Fixed
+   * Added default values for some inputs

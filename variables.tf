@@ -6,7 +6,7 @@ variable "ibmcloud_api_key" {
 
 variable "cluster-name" {
   type        = string
-  description = "Name of the target or new IBM Cloud OpenShift Cluster"
+  description = "Name of the new IBM Cloud OpenShift Cluster"
 }
 
 variable "region" {
@@ -33,12 +33,12 @@ variable "machine-type" {
 
 variable "cos-instance" {
   type        = string
-  description = "COS instance where a bucket will be created to back ROKS internal registry. Leave blank if you want the DA to create a new COS instance"
+  description = "Leave blank to have a new COS instance created. Specify an existing COS instance if you want to reuse it."
   default     = null
 }
 
 variable "resource-group" {
   type        = string
-  description = "Specify an existing resource group if you want to use it. Leave blank to have a new one created"
+  description = "Leave blank to have a new resource group created. Specify an existing resource group if you want to reuse it."
   default     = null
 }

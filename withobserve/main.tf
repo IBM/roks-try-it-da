@@ -93,6 +93,8 @@ module "observability_instances" {
   resource_group_id                 = local.resource_group
   log_analysis_plan                 = "7-day"
   cloud_monitoring_plan             = "graduated-tier"
+  log_analysis_provision            = var.logging-instance == null ? true : false
+  cloud_monitoring_provision        = var.monitoring-instance == null ? true : false
   activity_tracker_provision        = false
   enable_platform_logs              = false
   enable_platform_metrics           = false
@@ -124,16 +126,49 @@ module "ocp_base" {
 }
 
 ##############################################################################
+# Get data in existing instances if customer provided
+##############################################################################
+data "ibm_resource_instance" "logging" {
+  count    = var.logging-instance == null ? 0 : 1
+  name     = var.logging-instance
+  service  = "logdna"
+  location = var.region
+}
+
+data "ibm_resource_instance" "monitoring" {
+  count    = var.monitoring-instance == null ? 0 : 1
+  name     = var.monitoring-instance
+  service  = "sysdig-monitor"
+  location = var.region
+}
+
+##############################################################################
+# Create a access manager key if customer provided an instance
+##############################################################################
+resource "ibm_resource_key" "loggingKey" {
+  count                = var.logging-instance == null ? 0 : 1
+  name                 = "TryitLoggingKey"
+  resource_instance_id = data.ibm_resource_instance.logging[0].id
+  role                 = "Manager"
+}
+resource "ibm_resource_key" "monitoringKey" {
+  count                = var.monitoring-instance == null ? 0 : 1
+  name                 = "TryitMonitoringKey"
+  resource_instance_id = data.ibm_resource_instance.monitoring[0].id
+  role                 = "Manager"
+}
+
+##############################################################################
 # Connect the logging and monitoring instances to the cluster
 ##############################################################################
 resource "ibm_ob_logging" "logging" {
   depends_on  = [module.ocp_base]
   cluster     = module.ocp_base.cluster_id
-  instance_id = module.observability_instances.log_analysis_guid
+  instance_id = var.logging-instance == null ? module.observability_instances.log_analysis_guid : var.logging-instance
 }
 
 resource "ibm_ob_monitoring" "monitoring" {
   depends_on  = [module.ocp_base]
   cluster     = module.ocp_base.cluster_id
-  instance_id = module.observability_instances.cloud_monitoring_guid
+  instance_id = var.monitoring-instance == null ? module.observability_instances.cloud_monitoring_guid : var.monitoring-instance
 }
