@@ -212,7 +212,7 @@
                             {
 								"title": "New IBM Cloud Log Analysis and Monitoring instances (if existing ones are not specified)",
 								"description": "Yes"
-							}
+							},
 							{
 								"title": "New OpenShift cluster integrated with logging and monitoring instances",
 								"description": "Yes"
