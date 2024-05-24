@@ -42,10 +42,10 @@ You need the following permissions to run this module.
   - **Cloud Object Storage** service (to create a COS instance)
       - `Administrator` platform access
       - `Manager` service access
- - **IBM Log Anaysis** service (to create a Log Analysis instance)
+  - **IBM Log Anaysis** service (to create a Log Analysis instance)
       - `Administrator` platform access
       - `Manager` service access
-- **IBM Cloud Monitoring** service (to create a Monitoring instance)
+  - **IBM Cloud Monitoring** service (to create a Monitoring instance)
       - `Administrator` platform access
       - `Manager` service access
 
@@ -67,17 +67,21 @@ You need the following permissions to run this module.
 | machine-type | Worker node machine type. Use 'ibmcloud ks flavors --zone <zone>' to retrieve the list.| `string` | bx2.4x16 | yes |
 | cos-instance | A pre-existing COS service instance where a bucket will be provisioned to back the internal registry. If you leave this blank, a new COS instance will be created for you | `string` | none | no |
 | resource-group | A pre-existing resource group. If you leave this blank, a new resource group will be created for you | `string` | none | no |
+| logging-instance | A pre-existing logging service instance. If you leave this blank, a new logging service will be created for you | `string` | none | no |
+| monitoring-instance | A pre-existing monitoring service instance. If you leave this blank, a new monitoring service will be created for you | `string` | none | no |
 
 ## Sample terraform.tfvars file
 
 **NOTE:** If running Terraform yourself, pass in your `ibmcloud_api_key` in the environment variable `TF_VAR_ibmcloud_api_key`
 
 ```
-cluster-name = "cluster-abc"
-region = "ca-tor"
-ocp-version = "4.15"
-#number-worker-nodes = 2
-#machine-type = "bx2.4x16"
-#cos-instance = "Cloud Object Storage-abc"
-#resource-group = "my-resource-group"
+cluster-name = "test-cluster"
+region = "us-south"
+ocp-version = "4.14"
+number-worker-nodes = 2
+machine-type = "bx2.4x16"
+#cos-instance = "ExistingCOS"
+#resource-group = "ExistingResourceGroup"
+#monitoring-instance = "ExistingMonitoring"
+#logging-instance = "ExistingLogging"
 ```
