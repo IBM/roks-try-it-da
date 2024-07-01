@@ -33,12 +33,12 @@ variable "machine-type" {
 
 variable "cos-instance" {
   type        = string
-  description = "Leave blank to have a new COS instance created. Specify an existing COS instance if you want to reuse it."
+  description = "You have 3 choices. If you leave this blank, a new COS instance will be created for you. If you specify the name of an existing COS instance, it will be used. Or a new instance will be created for the name you provide."
   default     = null
 }
 
 variable "resource-group" {
   type        = string
-  description = "Leave blank to have a new resource group created. Specify an existing resource group if you want to reuse it."
+  description = "You have 3 choices. If you leave this blank, a new resource group will be created for you. If you specify the name of an existing resource group, it will be used. Or a new resource group will be created for the name you provide."
   default     = null
 }
