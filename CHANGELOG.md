@@ -26,3 +26,9 @@ All notable changes to this project will be documented in this file.
    * Allow user to reuse logging and/or monitoring instances
 ### Fixed
    * Added default values for some inputs
+
+## 1.0.4 - 2024-07-01
+### Added
+   * Allow user to specify new resource group/COS/logging/monitoring instances
+### Changed
+### Fixed

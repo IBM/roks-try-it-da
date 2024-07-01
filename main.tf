@@ -1,15 +1,35 @@
 ########################################################################################################################
+# Determnine if the user named resource group and COS instance exists
+########################################################################################################################
+data "external" "resource_data" {
+  program    = ["bash", "${path.module}/scripts/check-resources.sh"]
+  query      = {
+    rg_name  = var.resource-group == null ? "does not exist" : var.resource-group
+    cos_name = var.cos-instance == null ? "does not exist" : var.cos-instance
+  }
+}
+
+########################################################################################################################
 # Resource Group
 ########################################################################################################################
 
 resource "ibm_resource_group" "res_group" {
-  count = var.resource-group == null ? 1 : 0
-  name  = "tryit-resource-group"
+  count = data.external.resource_data.result.create_rg == "true" ? 1 : 0
+  name  = var.resource-group == null ? "tryit-resource-group" : var.resource-group
 }
 
 data "ibm_resource_group" "resource_group" {
-  count = var.resource-group == null ? 0 : 1
+  count = data.external.resource_data.result.create_rg == "false" ? 1 : 0
   name  = var.resource-group
+}
+
+##############################################################################
+# Fetch the COS info if one already exists
+##############################################################################
+data "ibm_resource_instance" "cos_instance" {
+  count             = data.external.resource_data.result.create_cos == "false" ? 1 : 0
+  name              = var.cos-instance
+  service           = "cloud-object-storage"
 }
 
 ########################################################################################################################
@@ -46,7 +66,7 @@ resource "ibm_is_subnet" "subnet_zone_1" {
 
 locals {
 
-  resource_group = var.resource-group == null ? ibm_resource_group.res_group[0].id : data.ibm_resource_group.resource_group[0].id
+  resource_group = data.external.resource_data.result.create_rg == "true" ? ibm_resource_group.res_group[0].id : data.ibm_resource_group.resource_group[0].id
 
   cluster_vpc_subnets = {
     default = [
@@ -69,20 +89,10 @@ locals {
 }
 
 ##############################################################################
-# Fetch the COS info if one already exists
-##############################################################################
-data "ibm_resource_instance" "cos_instance" {
-  count             = var.cos-instance == null ? 0 : 1
-  name              = var.cos-instance
-  service           = "cloud-object-storage"
-}
-
-##############################################################################
 # Create the cluster
 ##############################################################################
 module "ocp_base" {
   source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  ibmcloud_api_key                    = var.ibmcloud_api_key
   resource_group_id                   = local.resource_group
   region                              = var.region
   tags                                = ["createdby:TRYIT-DA"]
@@ -94,7 +104,8 @@ module "ocp_base" {
   worker_pools                        = local.worker_pools
   ocp_entitlement                     = null
   disable_outbound_traffic_protection = true
-  use_existing_cos                    = var.cos-instance == null ? false :  true
-  existing_cos_id                     = var.cos-instance == null ? null : data.ibm_resource_instance.cos_instance[0].id
-  cos_name                            = "tryit-cos-instance"
+  #operating_system                    = var.ocp-version == "4.15" ? "RHCOS" : null
+  use_existing_cos                    = data.external.resource_data.result.create_cos == "false" ? true : false
+  existing_cos_id                     = data.external.resource_data.result.create_cos == "false" ? data.ibm_resource_instance.cos_instance[0].id : null
+  cos_name                            = var.cos-instance == null ? "tryit-cos-instance" : var.cos-instance
 }

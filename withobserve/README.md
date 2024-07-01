@@ -17,13 +17,13 @@ You may provide a existing resource group where all of the new resources will be
 
 ## Created Resources
 The following items will get created:
-1. A resource group named `tryit-resource-group` (if no existing resource group is provided)
+1. A resource group if you don't provide the name of an existing one (default value is `tryit-resource-group`)
 2. A subnet named `tryit-subnet-1` in zone 1 of the chosen region in the resource group
 3. A public gateway named `tryit-gateway-1` attached to the subnet in the resource group
 4. A vpc named `tryit-vpc` containing the above subnet and public gateway in the resource group
-5. A Cloud logging instance called `tryit-log-analysis`
-6. A Cloud Monitoring instance called `tryit-cloud-monitoring`
-7. A COS instance named `tryit-cos-instance` (if no existing COS instance is provided)
+5. A COS instance if you don't provide the name of an existing one (default value is `tryit-cos-instance`)
+6. A Cloud logging service instance if you don't provide the name of an existing one (default value is `tryit-log-analysis`)
+7. A Cloud monitoring service instance if you don't provide the name of an existing one (default value is `tryit-cloud-monitoring`)
 8. A single zone cluster in the created subnet and vpc with the user specified number of workers in the resource group. The cluster is already integrated with logging and monitoring but not with any encryption service or secrets management. It will be publicly accessible.
 
 ## Required IAM access policies
@@ -65,10 +65,10 @@ You need the following permissions to run this module.
 | ocp-version | Major.minor version of the OCP cluster to provision | `string` | none | yes |
 | number-worker-nodes | The number of GPU nodes expected to be found or to create in the cluster | `number` | 2 | yes |
 | machine-type | Worker node machine type. Use 'ibmcloud ks flavors --zone <zone>' to retrieve the list.| `string` | bx2.4x16 | yes |
-| cos-instance | A pre-existing COS service instance where a bucket will be provisioned to back the internal registry. If you leave this blank, a new COS instance will be created for you | `string` | none | no |
-| resource-group | A pre-existing resource group. If you leave this blank, a new resource group will be created for you | `string` | none | no |
-| logging-instance | A pre-existing logging service instance. If you leave this blank, a new logging service will be created for you | `string` | none | no |
-| monitoring-instance | A pre-existing monitoring service instance. If you leave this blank, a new monitoring service will be created for you | `string` | none | no |
+| cos-instance | A COS service instance where a bucket will be provisioned to back the internal registry. You have 3 choices. If you leave this blank, a new COS instance will be created for you named `tryit-cos-instance`. If you specify the name of a COS instance that already exists, it will be used. Or a new instance will created for the name you provide. | `string` | none | no |
+| resource-group | A resource group. You have 3 choices. If you leave this blank, a new resource group will be created for you named `tryit-resource-group`. If you specify the name of a resource group that already exists, it will be used. Or a new resource group will be created for the name you provide. | `string` | none | no |
+| logging-instance | A logging service instance. You have 3 choices. If you leave this blank, a new logging instance will be created for you named `tryit-log-analysis`. If you specify the name of a logging instance that already exists, it will be used. Or a new logging instance will be created for the name you provide.  | `string` | none | no |
+| monitoring-instance | A monitoring service instance. You have 3 choices. If you leave this blank, a new monitoring instance will be created for you named `tryit-cloud-monitoring`. If you specify the name of a monitoring instance that already exists, it will be used. Or a new monitoring  instance will be created for the name you provide.  | `string` | none | no |
 
 ## Sample terraform.tfvars file
 
@@ -80,8 +80,8 @@ region = "us-south"
 ocp-version = "4.14"
 number-worker-nodes = 2
 machine-type = "bx2.4x16"
-#cos-instance = "ExistingCOS"
-#resource-group = "ExistingResourceGroup"
-#monitoring-instance = "ExistingMonitoring"
-#logging-instance = "ExistingLogging"
+#cos-instance = "ExistingOrNewCOS"
+#resource-group = "ExistingOrNewResourceGroup"
+#monitoring-instance = "ExistingOrNewMonitoring"
+#logging-instance = "ExistingOrNewLogging"
 ```

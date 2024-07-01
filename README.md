@@ -17,11 +17,11 @@ You may provide a existing resource group where all of the new resources will be
 
 ## Created Resources
 The following items will get created:
-1. A resource group named `tryit-resource-group` (if no existing resource group is provided)
+1. A resource group if you don't provide the name of an existing one (default value is `tryit-resource-group`)
 2. A subnet named `tryit-subnet-1` in zone 1 of the chosen region in the resource group
 3. A public gateway named `tryit-gateway-1` attached to the subnet in the resource group
 4. A vpc named `tryit-vpc` containing the above subnet and public gateway in the resource group
-5. A COS instance named `tryit-cos-instance` (if no existing COS instance is provided)
+5. A COS instance if you don't provide the name of an existing one (default value is `tryit-cos-instance`)
 6. A single zone cluster in the created subnet and vpc with the user specified number of workers in the resource group. The cluster does not have logging, monitoring, secrets manager, or encryption attached at all. It will be publicly accessible.
 
 ## Required IAM access policies
@@ -56,19 +56,19 @@ You need the following permissions to run this module.
 | ocp-version | Major.minor version of the OCP cluster to provision | `string` | none | yes |
 | number-worker-nodes | The number of GPU nodes expected to be found or to create in the cluster | `number` | 2 | yes |
 | machine-type | Worker node machine type. Use 'ibmcloud ks flavors --zone <zone>' to retrieve the list.| `string` | bx2.4x16 | yes |
-| cos-instance | A pre-existing COS service instance where a bucket will be provisioned to back the internal registry. If you leave this blank, a new COS instance will be created for you | `string` | none | no |
-| resource-group | A pre-existing resource group. If you leave this blank, a new resource group will be created for you | `string` | none | no |
+| cos-instance | A COS service instance where a bucket will be provisioned to back the internal registry. You have 3 choices. If you leave this blank, a new COS instance will be created for you named `tryit-cos-instance`. If you specify the name of a COS instance that already exists, it will be used. Or a new instance will be created for the name you provide. | `string` | none | no |
+| resource-group | A resource group. You have 3 choices. If you leave this blank, a new resource group will be created for you named `tryit-resource-group`. If you specify the name of a resource group that already exists, it will be used. Or a new resource group will be provided for the name you provide. | `string` | none | no |
 
 ## Sample terraform.tfvars file
 
 **NOTE:** If running Terraform yourself, pass in your `ibmcloud_api_key` in the environment variable `TF_VAR_ibmcloud_api_key`
 
 ```
-cluster-name = "cluster-abc"
-region = "ca-tor"
+cluster-name = "test-cluster"
+region = "us-south"
 ocp-version = "4.15"
-#number-worker-nodes = 2
-#machine-type = "bx2.4x16"
-#cos-instance = "Cloud Object Storage-abc"
-#resource-group = "my-resource-group"
+number-worker-nodes = 2
+machine-type = "bx2.4x16"
+#cos-instance = "ExistingOrNewCOS"
+#resource-group = "ExistingOrNewResourceGroup"
 ```

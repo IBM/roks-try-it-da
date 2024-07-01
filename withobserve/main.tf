@@ -1,15 +1,37 @@
 ########################################################################################################################
+# Determnine if the user named resource group and COS instance exists
+########################################################################################################################
+data "external" "resource_data" {
+  program    = ["bash", "${path.module}/scripts/check-resources.sh"]
+  query      = {
+    rg_name  = var.resource-group == null ? "does not exist" : var.resource-group
+    cos_name = var.cos-instance == null ? "does not exist" : var.cos-instance
+    log_name = var.logging-instance == null ? "does not exist" : var.logging-instance
+    mon_name = var.monitoring-instance == null ? "does not exist" :var.monitoring-instance
+  }
+}
+
+########################################################################################################################
 # Resource Group
 ########################################################################################################################
 
 resource "ibm_resource_group" "res_group" {
-  count = var.resource-group == null ? 1 : 0
-  name  = "tryit-resource-group"
+  count = data.external.resource_data.result.create_rg == "true" ? 1 : 0
+  name  = var.resource-group == null ? "tryit-resource-group" : var.resource-group
 }
 
 data "ibm_resource_group" "resource_group" {
-  count = var.resource-group == null ? 0 : 1
+  count = data.external.resource_data.result.create_rg == "false" ? 1 : 0
   name  = var.resource-group
+}
+
+#############################################################################
+# Fetch the COS info if one already exists
+##############################################################################
+data "ibm_resource_instance" "cos_instance" {
+  count             = data.external.resource_data.result.create_cos == "false" ? 1 : 0
+  name              = var.cos-instance
+  service           = "cloud-object-storage"
 }
 
 ########################################################################################################################
@@ -46,7 +68,7 @@ resource "ibm_is_subnet" "subnet_zone_1" {
 
 locals {
 
-  resource_group = var.resource-group == null ? ibm_resource_group.res_group[0].id : data.ibm_resource_group.resource_group[0].id
+  resource_group = data.external.resource_data.result.create_rg == "true" ? ibm_resource_group.res_group[0].id : data.ibm_resource_group.resource_group[0].id
 
   cluster_vpc_subnets = {
     default = [
@@ -69,15 +91,6 @@ locals {
 }
 
 ##############################################################################
-# Fetch the COS info if one already exists
-##############################################################################
-data "ibm_resource_instance" "cos_instance" {
-  count             = var.cos-instance == null ? 0 : 1
-  name              = var.cos-instance
-  service           = "cloud-object-storage"
-}
-
-##############################################################################
 # Create observability instances
 ##############################################################################
 module "observability_instances" {
@@ -88,13 +101,13 @@ module "observability_instances" {
     logdna.ld = logdna.ld
   }
   region                            = var.region
-  log_analysis_instance_name        = "tryit-log-analysis"
-  cloud_monitoring_instance_name    = "tryit-cloud-monitoring"
+  log_analysis_instance_name        = var.logging-instance == null ? "tryit-log-analysis" : var.logging-instance
+  cloud_monitoring_instance_name    = var.monitoring-instance == null ? "tryit-cloud-monitoring" : var.monitoring-instance
   resource_group_id                 = local.resource_group
   log_analysis_plan                 = "7-day"
   cloud_monitoring_plan             = "graduated-tier"
-  log_analysis_provision            = var.logging-instance == null ? true : false
-  cloud_monitoring_provision        = var.monitoring-instance == null ? true : false
+  log_analysis_provision            = data.external.resource_data.result.create_log == "true" ? true : false
+  cloud_monitoring_provision        = data.external.resource_data.result.create_mon == "true" ? true : false
   activity_tracker_provision        = false
   enable_platform_logs              = false
   enable_platform_metrics           = false
@@ -107,8 +120,6 @@ module "observability_instances" {
 ##############################################################################
 module "ocp_base" {
   source                              = "terraform-ibm-modules/base-ocp-vpc/ibm"
-  depends_on                          = [ibm_is_vpc.vpc]
-  ibmcloud_api_key                    = var.ibmcloud_api_key
   resource_group_id                   = local.resource_group
   region                              = var.region
   tags                                = ["createdby:TRYIT-DA"]
@@ -120,23 +131,24 @@ module "ocp_base" {
   worker_pools                        = local.worker_pools
   ocp_entitlement                     = null
   disable_outbound_traffic_protection = true
-  use_existing_cos                    = var.cos-instance == null ? false :  true
-  existing_cos_id                     = var.cos-instance == null ? null : data.ibm_resource_instance.cos_instance[0].id
-  cos_name                            = "tryit-cos-instance"
+  #operating_system                    = var.ocp-version == "4.15" ? "RHCOS" : null
+  use_existing_cos                    = data.external.resource_data.result.create_cos == "false" ? true : false
+  existing_cos_id                     = data.external.resource_data.result.create_cos == "false" ? data.ibm_resource_instance.cos_instance[0].id : null
+  cos_name                            = var.cos-instance == null ? "tryit-cos-instance" : var.cos-instance
 }
 
 ##############################################################################
 # Get data in existing instances if customer provided
 ##############################################################################
 data "ibm_resource_instance" "logging" {
-  count    = var.logging-instance == null ? 0 : 1
+  count    = data.external.resource_data.result.create_log == "false" ? 1 : 0
   name     = var.logging-instance
   service  = "logdna"
   location = var.region
 }
 
 data "ibm_resource_instance" "monitoring" {
-  count    = var.monitoring-instance == null ? 0 : 1
+  count    = data.external.resource_data.result.create_mon == "false" ? 1 : 0
   name     = var.monitoring-instance
   service  = "sysdig-monitor"
   location = var.region
@@ -146,13 +158,13 @@ data "ibm_resource_instance" "monitoring" {
 # Create a access manager key if customer provided an instance
 ##############################################################################
 resource "ibm_resource_key" "loggingKey" {
-  count                = var.logging-instance == null ? 0 : 1
+  count                = data.external.resource_data.result.create_log == "false" ? 1 : 0
   name                 = "TryitLoggingKey"
   resource_instance_id = data.ibm_resource_instance.logging[0].id
   role                 = "Manager"
 }
 resource "ibm_resource_key" "monitoringKey" {
-  count                = var.monitoring-instance == null ? 0 : 1
+  count                = data.external.resource_data.result.create_mon == "false" ? 1 : 0
   name                 = "TryitMonitoringKey"
   resource_instance_id = data.ibm_resource_instance.monitoring[0].id
   role                 = "Manager"
@@ -164,11 +176,11 @@ resource "ibm_resource_key" "monitoringKey" {
 resource "ibm_ob_logging" "logging" {
   depends_on  = [module.ocp_base]
   cluster     = module.ocp_base.cluster_id
-  instance_id = var.logging-instance == null ? module.observability_instances.log_analysis_guid : var.logging-instance
+  instance_id = data.external.resource_data.result.create_log == "true" ? module.observability_instances.log_analysis_guid : var.logging-instance
 }
 
 resource "ibm_ob_monitoring" "monitoring" {
   depends_on  = [module.ocp_base]
   cluster     = module.ocp_base.cluster_id
-  instance_id = var.monitoring-instance == null ? module.observability_instances.cloud_monitoring_guid : var.monitoring-instance
+  instance_id = data.external.resource_data.result.create_mon == "true" ? module.observability_instances.cloud_monitoring_guid : var.monitoring-instance
 }

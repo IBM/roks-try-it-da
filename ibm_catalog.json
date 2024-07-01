@@ -31,7 +31,7 @@
                 },
                 {
                     "title": "OpenShift Cluster",
-                    "description": "Creates a simple publicly accessible OpenShift cluster without any attached services"
+                    "description": "Creates a simple publicly accessible single zone OpenShift cluster"
                 }
             ],
             "flavors": [
@@ -141,7 +141,7 @@
                             "key": "ocp-version",
                             "type": "string",
                             "required": true,
-                            "default_value": "4.14",
+                            "default_value": "4.15",
                             "options": [
                                 {
                                     "displayname": "4.12",
@@ -310,7 +310,7 @@
                             "key": "ocp-version",
                             "type": "string",
                             "required": true,
-                            "default_value": "4.14",
+                            "default_value": "4.15",
                             "options": [
                                 {
                                     "displayname": "4.12",
